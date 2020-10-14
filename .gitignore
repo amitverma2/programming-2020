@@ -1,2 +1,4 @@
 *.dSYM
 .DS_Store
+settings.json
+tasks.json
