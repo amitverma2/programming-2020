@@ -18,6 +18,8 @@ public:
         return count;
     }
     int arrayPairSumOrderN(vector<int>& nums) {
+      // this is still sorting, but knowing the limits of the values, we can do a integer count instead.
+      
       const int limitVal = 100000; // minimum value of an element in nums is -limitVal, maximum is +limitVal
       int counts[2*limitVal+1] = {0}; // 2*limitVal + 1 should cover all possible range of input in nums
       for(auto n : nums) {
