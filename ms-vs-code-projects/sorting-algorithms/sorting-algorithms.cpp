@@ -44,21 +44,42 @@ public:
     int N = nums.size();
 
     for (int i = 0; i < N; ++i) {
-      for (int j = i ; j > 0; --j) {
-        if (nums[j-1] > nums[j]) {
+      for (int j = i ; j > 0 && nums[j-1] > nums[j]; --j) {
           swap(nums, j-1, j);
-        } else {
-          break;
-        }
       }
     }
+  }
+};
+
+class CountingSort: public Sorting {
+public:
+  void sort(std::vector<int>& nums) {
+    std::cout << "Counting sort (limit of 9999)...\n";
+    // assume nums have +ve ints max of 9999
+    int counts[10000] = {0};
+    for (auto x : nums) {
+      counts[x]++;
+    }
+    int index = 0;
+    for (int i = 0 ; i < 10000; ++i) {
+      for (int n  = 0; n < counts[i]; ++n) {
+        nums[index++] = i;
+      }
+    }
+  }
+};
+
+class RadixSort : public Sorting {
+public:
+  void sort(std::vector<int>& nums) {
+    /// tbd
   }
 };
 
 int main() {
   std::vector<int> nums = { 2, 3, 4, 1, 5 ,9, 10, 30, 6, 5 };
 
-  Sorting* obj = new InsertionSort;
+  Sorting* obj = new CountingSort;
 
   std::cout << "Before sorting...\n";
   obj->print(nums);
