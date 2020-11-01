@@ -34,10 +34,38 @@ public:
     }
 };
 
+class Solution2 {
+public:
+    int max(int a, int b) {
+        if (a > b) return a;
+        return b;
+    }
+    int calculateAreaRecursive(vector<int>& heights, int left, int right) {
+        if (left > right) {
+            return 0;
+        }
+        // find minimum
+        int min = left;
+        for (int i = left; i <= right; ++i) {
+            if (heights[min] > heights[i]) {
+                min = i;
+            }
+        }
+        int minLeft = calculateAreaRecursive(heights, left, min-1);
+        int minRight = calculateAreaRecursive(heights, min+1, right);
+        int minHeightArea = heights[min] * (right - left + 1);
+        return max(minLeft, max(minRight, minHeightArea));
+    }
+    // divide and conquer
+    int largestRectangleArea(vector<int>& heights) {
+        return calculateAreaRecursive(heights, 0, heights.size()-1);
+    }
+};
+
 int main() {
   vector<int> heights = { 2, 1, 5, 6, 2, 3 };
 
-  Solution* obj = new Solution;
+  Solution2* obj = new Solution2;
 
   std::cout << "Largest rectangle area : " << obj->largestRectangleArea(heights) << std::endl;
 
