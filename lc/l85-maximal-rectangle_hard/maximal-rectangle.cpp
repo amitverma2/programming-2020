@@ -39,6 +39,60 @@ public:
     }
 };
 
+class Solution2 {
+public:
+    // this is brute force still
+    int largestRectangleArea(const vector<int>& heights) {
+        vector<int> sortedHeights = heights;
+        sort(sortedHeights.begin(), sortedHeights.end());
+        int max = 0;
+        for (vector<int>::const_iterator i = sortedHeights.begin();
+            i != sortedHeights.end();
+            ++i) {
+            int heightsMax = 0;
+            int curMax = 0;
+            for (int j = 0; j < heights.size(); ++j) {
+                int min = ((heights[j] < *i)?(0):(*i));
+                if (min == 0) {
+                    curMax = 0;
+                } else {
+                    curMax += *i;
+                }
+                if (curMax > heightsMax) {
+                    heightsMax = curMax;
+                }
+            }
+            if (heightsMax > max) {
+                max = heightsMax;
+            }
+        }
+        return max;
+    }
+    
+    // this is a bit optimized
+    int maximalRectangle(vector<vector<char>>& matrix) {
+        if (matrix.size() == 0) { return 0; }
+        
+        vector<int> heights(matrix[0].size());
+        
+        int max = 0;
+        for (int i = 0 ; i < matrix.size(); ++i) {
+            for (int j = 0; j < matrix[i].size(); ++j) {
+                if (i == 0) { 
+                    heights[j] = ((matrix[i][j] == '1')?1:0);
+                } else {
+                    heights[j] = ((matrix[i][j] == '1')?(heights[j]+1):0);
+                }
+            }
+            int curRowMax = largestRectangleArea(heights);
+            if (curRowMax > max) {
+                max = curRowMax;
+            }
+        }
+        return max;
+    }
+};
+
 int main() {
   vector<vector<char> > matrix = {
     { '1', '0', '1', '0', '0' },
@@ -47,7 +101,7 @@ int main() {
     { '1', '0', '0', '1', '0' }
   };
 
-  Solution* obj = new Solution;
+  Solution2* obj = new Solution2;
 
   std::cout << "Max area: " << obj->maximalRectangle(matrix) << std::endl;
 
