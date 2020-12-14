@@ -5,6 +5,42 @@
 
 using namespace std;
 
+class SolutionSlidingWindow {
+public:
+    int kEmptySlots(vector<int>& bulbs, int k) {
+        vector<int> row(bulbs.size());
+        for (int day = 0; day < bulbs.size(); ++day) row[bulbs[day]-1] = day;
+        
+        int minDay = row.size() + 1;
+        
+        int l = 0;
+        int r = l + k + 1;
+        
+        while (r < row.size()) {
+            int j;
+            for (j = l+1 ; j < r; ++j) {
+                if (row[j] < row[l] || row[j] < row[r]) {
+                    l = j;
+                    r = l + k + 1;
+                    break;
+                }
+            }
+            if (j == r) {
+                int curMin = row[l];
+                if (row[r] > curMin) curMin = row[r];
+                if (minDay > curMin) minDay = curMin;
+                
+                l = r;
+            } else {
+                l = j;
+            }
+            r = l + k + 1;
+        }
+        if (minDay == row.size() + 1) return -1;
+        return minDay + 1;
+    }
+};
+
 class SolutionMinQueue {
 public:
     int kEmptySlots(vector<int>& bulbs, int k) {
@@ -86,7 +122,7 @@ int main() {
   };
   int k = 4973;
 
-  SolutionMinQueue *obj = new SolutionMinQueue;
+  SolutionSlidingWindow *obj = new SolutionSlidingWindow;
   
   std::cout << "Solution: " << obj->kEmptySlots(bulbs, k) << std::endl;
 
