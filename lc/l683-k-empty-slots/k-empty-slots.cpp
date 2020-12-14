@@ -1,8 +1,53 @@
 #include<iostream>
 #include<set>
 #include<vector>
+#include<deque>
 
 using namespace std;
+
+class SolutionMinQueue {
+public:
+    int kEmptySlots(vector<int>& bulbs, int k) {
+        vector<int> row(bulbs.size());
+        for (int day = 0; day < bulbs.size(); ++day)
+        {
+            row[bulbs[day]-1] = day;
+        }
+        
+        int minDay = bulbs.size() + 1;
+        deque<int> window;
+        deque<int> mins;
+        
+        for (int pos = 0; pos < row.size(); ++pos) {
+            window.push_back(row[pos]);
+            while (!mins.empty() && mins.back() > row[pos])
+                mins.pop_back();
+            mins.push_back(row[pos]);
+            
+            if (pos >= k && pos < row.size() - 1) {
+                if (window.front() == mins.front()) {
+                    mins.pop_front();
+                }
+                window.pop_front();
+                int minInWindow = mins.front();
+                if (k == 0 ||
+                    (minInWindow > row[pos-k] &&
+                     minInWindow > row[pos+1])) {
+                    int maxDay = row[pos-k];
+                    if (row[pos+1] > maxDay) {
+                        maxDay = row[pos+1];
+                    }
+                    if (maxDay < minDay) {
+                        minDay = maxDay;
+                    }
+                }
+            }
+        }
+        
+        if (minDay == bulbs.size() + 1) return -1;
+        return minDay + 1;
+    }
+};
 
 class Solution {
 public:
@@ -41,7 +86,8 @@ int main() {
   };
   int k = 4973;
 
-  Solution *obj = new Solution;
+  SolutionMinQueue *obj = new SolutionMinQueue;
+  
   std::cout << "Solution: " << obj->kEmptySlots(bulbs, k) << std::endl;
 
   return 0;
