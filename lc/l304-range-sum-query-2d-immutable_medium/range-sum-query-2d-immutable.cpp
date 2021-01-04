@@ -4,14 +4,14 @@
 
 using namespace std;
 
-class NumMatrix {
+class NumMatrixCachedHash {
     vector<vector<int>>& matrix;
     bool fast;
     unordered_map<unsigned int, int> hash;
     unsigned int numBits;
     unsigned int mask;
 public:
-    NumMatrix(vector<vector<int>>& matrix) : matrix(matrix), fast(false), numBits(sizeof(unsigned int) * 8), mask(~(~(unsigned int)(0) << (numBits/4))) {
+    NumMatrixCachedHash(vector<vector<int>>& matrix) : matrix(matrix), fast(false), numBits(sizeof(unsigned int) * 8), mask(~(~(unsigned int)(0) << (numBits/4))) {
         if (matrix.size() > 10 & matrix.size() <= (2^(numBits/4))) { 
             fast = true;
         }
@@ -83,6 +83,27 @@ public:
             for (int c= col1; c <= col2; ++c) {
                 sum += matrix[r][c];
             }
+        }
+        return sum;
+    }
+};
+
+class NumMatrix {
+    vector<vector<int>>& nums;
+    vector<vector<int>> sums;
+public:
+    NumMatrix(vector<vector<int>>& matrix) : nums(matrix), sums(matrix) {
+        for (int r = 0 ; r < matrix.size(); ++r) {
+            for (int c = 1; c < matrix[r].size(); ++c) {
+                sums[r][c] += sums[r][c-1];
+            }
+        }        
+    }
+    
+    int sumRegion(int row1, int col1, int row2, int col2) {
+        int sum = 0;
+        for (int r = row1; r <= row2; ++r) {
+            sum += sums[r][col2] - sums[r][col1] + nums[r][col1];
         }
         return sum;
     }
