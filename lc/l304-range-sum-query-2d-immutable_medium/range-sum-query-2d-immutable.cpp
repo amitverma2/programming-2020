@@ -109,11 +109,11 @@ public:
     }
 };
 
-class NumMatrix {
+class NumMatrixCachedBox {
     vector<vector<int>>& nums;
     vector<vector<int>> sums;
 public:
-    NumMatrix(vector<vector<int>>& matrix) : nums(matrix), sums(matrix) {
+    NumMatrixCachedBox(vector<vector<int>>& matrix) : nums(matrix), sums(matrix) {
         for (int r = 0 ; r < matrix.size(); ++r) {
             for (int c = 0; c < matrix[r].size(); ++c) {
                 if (r == 0) {
@@ -135,6 +135,30 @@ public:
         if (col1 > 0) sum -= sums[row2][col1-1];
         if (row1 > 0 & col1 > 0) sum += sums[row1-1][col1-1];
         return sum;
+    }
+};
+
+class NumMatrix {
+    int **sums;
+public:
+    NumMatrix(vector<vector<int>>& matrix) {
+        if (matrix.empty() || matrix[0].empty())
+            return;
+        
+        sums = new int*[matrix.size()+1];
+        for (int r = 0; r <= matrix.size(); ++r) {
+          sums[r] = new int[matrix[0].size()+1]();
+        }
+        
+        for (int r = 0; r < matrix.size(); ++r) {
+            for (int c = 0; c < matrix[0].size(); ++c) {
+                sums[r+1][c+1] = matrix[r][c] + sums[r][c+1] + sums[r+1][c] - sums[r][c];
+            }
+        }
+    }
+    
+    int sumRegion(int row1, int col1, int row2, int col2) {
+        return sums[row2+1][col2+1] - sums[row1][col2+1] - sums[row2+1][col1] + sums[row1][col1];
     }
 };
 
