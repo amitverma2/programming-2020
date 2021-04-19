@@ -1,5 +1,8 @@
 [org 0x7c00]                ; tell assember where the code will be loaded
 
+mov bp, 0x8000              ; setup stack base
+mov sp, bp
+
 mov bx, HELLO_MSG
 call print_string
 
