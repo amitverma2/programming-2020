@@ -3,7 +3,7 @@
 
 ; some useful defines
 VIDEO_MEMORY_START equ 0xB8000
-VIDEO_MEMORY_FLAG_WHITE_ON_BLACK equ 0x0F
+VIDEO_MEMORY_FLAG_WHITE_ON_BLACK equ 0x1C
 
 ; ebx is the start address of the string to be printed
 ; assume the string in null terminated
@@ -27,13 +27,13 @@ print_next_char:
     je finished_print_string_pm
 
     ; print this char as it's non null
-    mov [ebx], ax
+    mov [edx], ax
 
     ; get to next char
     add ebx, 1
 
     ; get to next video memory area
-    add edx, 1
+    add edx, 2
 
     ; go back and check next char to display
     jmp print_next_char
