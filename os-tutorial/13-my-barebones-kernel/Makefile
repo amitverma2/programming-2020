@@ -17,3 +17,6 @@ mykernel.o: mykernel.c mykernel.h
 
 run: os.img
 	qemu-system-x86_64 $<
+
+clean:
+	rm -f *.o *.bin *.img *.dis
