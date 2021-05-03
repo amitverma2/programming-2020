@@ -20,6 +20,14 @@ static inline void set_fb_cell (uint32_t cell, uint8_t data, uint8_t fg, uint8_t
     *(uint8_t*)(FRAMEBUFFER_START + 2*cell + 1) = (fg & 0xF) << 4 | (bg & 0xF);
 }
 
+static inline void set_fb (uint8_t row, uint8_t col, uint8_t data, uint8_t fg, uint8_t bg)
+{
+    set_fb_cell(get_fb_cell_offset(row,col),
+                data,
+                fg,
+                bg);
+}
+
 static uint16_t get_cursor_offset (void)
 {   uint8_t hi = 0;
     uint8_t lo = 0;
@@ -47,10 +55,10 @@ void clear_screen (void)
     /* low level api to clear all screen */
     for (uint32_t r = 0; r < MAX_ROWS; ++r) {
         for (uint32_t c = 0 ; c < MAX_COLS; ++c) {
-            set_fb_cell(get_fb_cell_offset(r, c),
-                        ' ',
-                        FB_COLOR_BLACK,
-                        FB_COLOR_WHITE);
+            set_fb(r, c,
+                   ' ',
+                   FB_COLOR_BLACK,
+                   FB_COLOR_WHITE);
         }
     }
     /* set cursor position at 0,0 */
@@ -65,20 +73,19 @@ void kprint_at (char* message, int row, int col)
     /* find starting position */
     if (col < 0 || row < 0) {
         uint16_t cursor_pos = get_cursor_offset();
-        r = (cursor_pos & 0xFF00) >> 8;
-        c = (cursor_pos & 0xFF);
+        r = cursor_pos/MAX_COLS;
+        c = cursor_pos - r*MAX_COLS;
     } else {
         r = (uint32_t)row;
         c = (uint32_t)col;
-        set_cursor(r, c);
     }
 
     /* print the message starting at r, c */
     while (*message) {
-        set_fb_cell(get_fb_cell_offset(r, c),
-                    (uint8_t)*message,
-                    FB_COLOR_BLACK,
-                    FB_COLOR_WHITE);
+        set_fb(r, c,
+               (uint8_t)*message,
+               FB_COLOR_BLACK,
+               FB_COLOR_WHITE);
         message++;
         c++;
         if (c >= MAX_COLS) { c = 0; r++; }

@@ -17,6 +17,7 @@ void my_kernel_entry(void)
                   r+i,
                   MAX_COLS/2-30);
     }
+    kprint("<===== let's see if this works|||||");
 
     return;
 }
