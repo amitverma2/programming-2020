@@ -17,8 +17,11 @@ void my_kernel_entry(void)
                   r+i,
                   MAX_COLS/2-30);
     }
-    kprint("<===== let's see if this works|||||");
+    kprint("<===== let's see if\n\n\n this works|||||\n");
 
+    kprint("Hello,\nWorld!\n");
+
+    kprint_at("Should show some error!", 24, 70);
     return;
 }
 

@@ -2,6 +2,16 @@
 #include "ports.h"
 #include "screen.h"
 
+static inline uint8_t fb_attr_to_fg(uint8_t attr)
+{
+    return (attr & 0xF);
+}
+
+static inline uint8_t fb_attr_to_bg(uint8_t attr)
+{
+    return (attr & 0xF0) >> 4;
+}
+
 static inline uint32_t get_fb_cell_offset (uint32_t row, uint32_t col) {
     return col + MAX_COLS*row;
 }
@@ -17,7 +27,7 @@ static inline uint8_t* get_fb_loc (uint32_t row, uint32_t col) {
 static inline void set_fb_cell (uint32_t cell, uint8_t data, uint8_t fg, uint8_t bg)
 {
     *(uint8_t*)(FRAMEBUFFER_START + 2*cell) = data;
-    *(uint8_t*)(FRAMEBUFFER_START + 2*cell + 1) = (fg & 0xF) << 4 | (bg & 0xF);
+    *(uint8_t*)(FRAMEBUFFER_START + 2*cell + 1) = ((bg & 0xF) << 4 | (fg & 0xF));
 }
 
 static inline void set_fb (uint8_t row, uint8_t col, uint8_t data, uint8_t fg, uint8_t bg)
@@ -28,6 +38,7 @@ static inline void set_fb (uint8_t row, uint8_t col, uint8_t data, uint8_t fg, u
                 bg);
 }
 
+/* this returns a cell offset */
 static uint16_t get_cursor_offset (void)
 {   uint8_t hi = 0;
     uint8_t lo = 0;
@@ -38,6 +49,7 @@ static uint16_t get_cursor_offset (void)
     return (hi << 8 | lo);
 }
 
+/* this takes a cell offset */
 static void set_cursor_offset (uint32_t offset) {
     port_byte_out(PORT_SCREEN_CTRL, PORT_SCREEN_CTRL_HI);
     port_byte_out(PORT_SCREEN_DATA, (offset & 0xFF00) >> 8);
@@ -45,9 +57,63 @@ static void set_cursor_offset (uint32_t offset) {
     port_byte_out(PORT_SCREEN_DATA, (offset & 0xFF));
 }
 
+static uint32_t get_cell_offset_row (uint16_t cell_offset)
+{
+    return cell_offset/MAX_COLS;
+}
+
+static uint32_t get_cell_offset_col (uint16_t cell_offset)
+{
+    return cell_offset - (cell_offset/MAX_COLS)*MAX_COLS;
+}
+
 static void set_cursor (uint32_t row, uint32_t col)
 {
     set_cursor_offset(get_fb_cell_offset(row, col));
+}
+
+/* this returns the cell offset of next position to print */
+static uint16_t print_char (char ch, int row, int col, int flags)
+{
+    uint8_t attr = FB_ATTR_WHITE_ON_BLACK;
+    if (flags != -1) {
+        attr = flags;
+    }
+
+    if (row >= MAX_ROWS || col >= MAX_COLS) {
+        /* display an E in the last row, col, in red bg */
+        set_fb(MAX_ROWS-1, MAX_COLS-1,
+               'E',
+               FB_COLOR_RED,
+               FB_COLOR_WHITE);
+        return get_fb_cell_offset(row, col);
+    }
+
+    int r = row;
+    int c = col;
+    if (row < 0 || col < 0) {
+        /* fetch the current row & col */
+        uint16_t cell_offset = get_cursor_offset();
+        r = get_cell_offset_row(cell_offset);
+        c = get_cell_offset_col(cell_offset);
+    }
+
+    if (ch == '\n') {
+        /* handle new line */
+        r++;
+        c = 0;
+        set_cursor_offset(get_fb_cell_offset(r, c));
+        return get_fb_cell_offset(r, c);
+    }
+
+    set_fb(r, c,
+           ch,
+           fb_attr_to_fg(attr),
+           fb_attr_to_bg(attr));
+
+    uint16_t next_offset = get_fb_cell_offset(r, c) + 1;
+    set_cursor_offset(next_offset);
+    return next_offset;
 }
 
 void clear_screen (void)
@@ -57,8 +123,8 @@ void clear_screen (void)
         for (uint32_t c = 0 ; c < MAX_COLS; ++c) {
             set_fb(r, c,
                    ' ',
-                   FB_COLOR_BLACK,
-                   FB_COLOR_WHITE);
+                   FB_COLOR_WHITE,
+                   FB_COLOR_BLACK);
         }
     }
     /* set cursor position at 0,0 */
@@ -67,32 +133,13 @@ void clear_screen (void)
 
 void kprint_at (char* message, int row, int col)
 {
-    uint32_t r = 0;
-    uint32_t c = 0;
-
-    /* find starting position */
-    if (col < 0 || row < 0) {
-        uint16_t cursor_pos = get_cursor_offset();
-        r = cursor_pos/MAX_COLS;
-        c = cursor_pos - r*MAX_COLS;
-    } else {
-        r = (uint32_t)row;
-        c = (uint32_t)col;
-    }
-
-    /* print the message starting at r, c */
     while (*message) {
-        set_fb(r, c,
-               (uint8_t)*message,
-               FB_COLOR_BLACK,
-               FB_COLOR_WHITE);
+        uint16_t next_offset = print_char(*message,
+                                          row, col,
+                                          -1);
         message++;
-        c++;
-        if (c >= MAX_COLS) { c = 0; r++; }
-        if (r >= MAX_ROWS) {
-            /* todo: screen needs scrolling */
-        }
-        set_cursor(r, c);
+        row = get_cell_offset_row(next_offset);
+        col = get_cell_offset_col(next_offset);
     }
 }
 
