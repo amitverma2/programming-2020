@@ -1,30 +1,23 @@
 #include "kernel.h"
-
-static void clear_screen(void)
-{
-    char space = ' ';
-    char flag = 0x00;
-    char * mem = (char *)VGA_DISPLAY_MEMORY_START;
-    for (int r = 0; r < 25; r++) {
-        for (int c = 0 ; c < 80; ++c) {
-            *(mem++) = space;
-            *(mem++) = flag;
-        }
-    }
-    return;
-}
+#include "screen.h"
 
 void my_kernel_entry(void)
 {
-    char * mem = (char *)VGA_DISPLAY_MEMORY_START;
-    char msg[] = "Hello, World from Amit's C Kernel!";
+    char* msgs[] = {
+        "--------------------------------------------------",
+        "Hello, world from Amit's screen driver!",
+        "--------------------------------------------------"
+    };
+    int msgs_count = sizeof(msgs)/sizeof(msgs[0]);
 
     clear_screen();
-
-    for (int i = 0 ; i < sizeof(msg)/sizeof(msg[0]) - 1; ++i) {
-        *(mem++) = msg[i];
-        *(mem++) = VGA_DISPLAY_FLAG;
+    int r = MAX_ROWS/2 - (msgs_count+1)/2;
+    for (int i = 0 ; i < msgs_count; i++) {
+        kprint_at(msgs[i],
+                  r+i,
+                  MAX_COLS/2-30);
     }
+
     return;
 }
 
