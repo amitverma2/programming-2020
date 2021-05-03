@@ -1,6 +1,7 @@
 #include "kernel_types.h"
 #include "ports.h"
 #include "screen.h"
+#include "utils.h"
 
 static inline uint8_t fb_attr_to_fg(uint8_t attr)
 {
@@ -98,20 +99,29 @@ static uint16_t print_char (char ch, int row, int col, int flags)
         c = get_cell_offset_col(cell_offset);
     }
 
+    uint16_t next_offset = 0;
     if (ch == '\n') {
-        /* handle new line */
-        r++;
-        c = 0;
-        set_cursor_offset(get_fb_cell_offset(r, c));
-        return get_fb_cell_offset(r, c);
+        next_offset = get_fb_cell_offset(r + 1, 0);
+    } else {
+        set_fb(r, c,
+               ch,
+               fb_attr_to_fg(attr),
+               fb_attr_to_bg(attr));
+        next_offset = get_fb_cell_offset(r, c) + 1;
     }
 
-    set_fb(r, c,
-           ch,
-           fb_attr_to_fg(attr),
-           fb_attr_to_bg(attr));
-
-    uint16_t next_offset = get_fb_cell_offset(r, c) + 1;
+    /* handle screen scroll */
+    if (next_offset >= MAX_COLS * MAX_ROWS) {
+        memory_move((uint8_t*)FRAMEBUFFER_START,                    /* copy to the start of framebuffer memory */
+                    (uint8_t*)(FRAMEBUFFER_START + 2 * MAX_COLS),   /* copy from the second line of the screen */
+                    2 * (MAX_ROWS-1) * MAX_COLS);
+        /* clear last row of the framebuffer */
+        for (int i = 0 ; i < MAX_COLS; ++i) {
+            *(uint8_t*)(FRAMEBUFFER_START + 2 * (MAX_ROWS-1) * MAX_COLS + 2 * i) = ' ';
+            *(uint8_t*)(FRAMEBUFFER_START + 2 * (MAX_ROWS-1) * MAX_COLS + 2 * i + 1) = FB_ATTR_WHITE_ON_BLACK;
+        }
+        next_offset = get_fb_cell_offset(MAX_ROWS - 1, 0);
+    }
     set_cursor_offset(next_offset);
     return next_offset;
 }

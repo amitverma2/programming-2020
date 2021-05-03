@@ -1,7 +1,8 @@
 #include "kernel.h"
 #include "screen.h"
+#include "utils.h"
 
-void my_kernel_entry(void)
+static void my_kernel_intro1 (void)
 {
     char* msgs[] = {
         "--------------------------------------------------",
@@ -22,6 +23,33 @@ void my_kernel_entry(void)
     kprint("Hello,\nWorld!\n");
 
     kprint_at("Should show some error!", 24, 70);
+    return;
+}
+
+static void my_kernel_intro2 (void)
+{
+    clear_screen();
+    for (int i = 0; i < MAX_ROWS; i++) {
+        char str[20] = "";
+        int_to_str(i, str);
+        kprint_at(str, i, 0);
+    }
+
+    kprint_at("This text forces the kernel to scroll. Row 0 will disappear. ", 24, 60);
+    kprint("And with this text, the kernel will scroll again, and row 1 will disappear too!");
+    return;
+}
+
+void my_kernel_entry (void)
+{
+    int intro = 2;
+
+    switch(intro) {
+        case 1: my_kernel_intro1(); break;
+        case 2: my_kernel_intro2(); break;
+        default:
+                my_kernel_intro1(); break;
+    }
     return;
 }
 
