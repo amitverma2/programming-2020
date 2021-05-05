@@ -1,6 +1,6 @@
 [bits 32]
 
-global igate0_divide_error 
+[global igate0_divide_error]
 
 igate0_divide_error:
     cli             ; disable interrupts
