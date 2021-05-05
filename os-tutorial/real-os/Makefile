@@ -1,5 +1,5 @@
-C_SOURCES = $(wildcard kernel/*.c drivers/*.c common/*.c)
-HEADERS = $(wildcard kernel/*.h drivers/*.h)
+C_SOURCES = $(wildcard kernel/*.c drivers/*.c common/*.c cpu/x86/*.c)
+HEADERS = $(wildcard kernel/*.h drivers/*.h common/include/*.h cpu/x86/*.h)
 # Nice syntax for file extension replacement
 OBJ = ${C_SOURCES:.c=.o}
 
@@ -15,7 +15,7 @@ os.img: boot/32bit-main.bin kernel.bin
 
 # '--oformat binary' deletes all symbols as a collateral, so we don't need
 # to 'strip' them manually on this case
-kernel.bin: boot/mykernel_entry.o ${OBJ}
+kernel.bin: boot/mykernel_entry.o cpu/x86/igates.o ${OBJ}
 	i386-elf-ld -o $@ -Ttext 0x1000 $^ --oformat binary
 
 # Used for debugging purposes
