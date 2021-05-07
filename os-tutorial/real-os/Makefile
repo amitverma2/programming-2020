@@ -44,3 +44,8 @@ debug: os.img kernel.elf
 clean:
 	rm -rf *.bin *.dis *.o os.img *.elf
 	rm -rf kernel/*.o boot/*.bin drivers/*.o boot/*.o common/*.o cpu/x86/*.o
+
+upload:
+	git add .
+	git commit
+	git push
