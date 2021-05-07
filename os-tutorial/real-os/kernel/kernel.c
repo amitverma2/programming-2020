@@ -1,6 +1,7 @@
 #include "kernel.h"
 #include "screen.h"
 #include "utils.h"
+#include "../cpu/x86/idt.h"
 
 static void my_kernel_intro1 (void)
 {
@@ -42,14 +43,24 @@ static void my_kernel_intro2 (void)
 
 void my_kernel_entry (void)
 {
-    int intro = 2;
+    /* setup IDT */
+    setup_idt();
+
+    int intro = 0;
 
     switch(intro) {
         case 1: my_kernel_intro1(); break;
         case 2: my_kernel_intro2(); break;
-        default:
-                my_kernel_intro1(); break;
     }
+
+    clear_screen();
+
+    /* raise some interrupts */
+    __asm__ __volatile__ ("int $0");
+    __asm__ __volatile__ ("int $3");
+    __asm__ __volatile__ ("int $5");
+    __asm__ __volatile__ ("int $20");
+
     return;
 }
 

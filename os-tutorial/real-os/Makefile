@@ -19,7 +19,7 @@ kernel.bin: boot/mykernel_entry.o cpu/x86/igates.o ${OBJ}
 	i386-elf-ld -o $@ -Ttext 0x1000 $^ --oformat binary
 
 # Used for debugging purposes
-kernel.elf: boot/mykernel_entry.o ${OBJ}
+kernel.elf: boot/mykernel_entry.o cpu/x86/igates.o ${OBJ}
 	i386-elf-ld -o $@ -Ttext 0x1000 $^ 
 
 run: os.img
@@ -43,4 +43,4 @@ debug: os.img kernel.elf
 
 clean:
 	rm -rf *.bin *.dis *.o os.img *.elf
-	rm -rf kernel/*.o boot/*.bin drivers/*.o boot/*.o
+	rm -rf kernel/*.o boot/*.bin drivers/*.o boot/*.o common/*.o cpu/x86/*.o
