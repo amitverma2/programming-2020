@@ -47,5 +47,8 @@ clean:
 
 upload:
 	git add .
+	git status
+	@echo "Press a key to commit. Ctrl-C to break..."
+	@read -n 1
 	git commit
 	git push
