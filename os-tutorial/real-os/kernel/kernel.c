@@ -2,6 +2,8 @@
 #include "screen.h"
 #include "utils.h"
 #include "../cpu/x86/idt.h"
+#include "timer.h"
+#include "pic8259a.h"
 
 static void my_kernel_intro1 (void)
 {
@@ -45,6 +47,15 @@ void my_kernel_entry (void)
 {
     /* setup IDT */
     setup_idt();
+
+    /* setup 8259A PIC */
+    pic8259a_init();
+
+    /* setup PIT programmable timer */
+    timer_init();
+
+    /* start the timer */
+    timer_start(50);
 
     int intro = 0;
 
