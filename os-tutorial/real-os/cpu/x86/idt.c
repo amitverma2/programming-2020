@@ -24,6 +24,9 @@ extern void igate18_machine_check_abort (void);
 extern void igate19_simd_fp_fault (void);
 extern void igate20_virtualization_exception_fault (void);
 
+/* interrupt vector */
+extern void igate32_timer_interrupt (void);
+
 idt_gate_descriptor_t idt_table[IDT_TABLE_SIZE];
 idtr_reg_t idtr_reg = {
     sizeof(idt_table) - 1,
@@ -42,6 +45,7 @@ static void setup_idt_gate_entry (int idx,
 
 void setup_idt (void)
 {
+    /* setup exceptions */
     setup_idt_gate_entry(0, (uint32_t)igate0_divide_error_fault);
     setup_idt_gate_entry(1, (uint32_t)igate1_debug_exception_fault_trap);
     setup_idt_gate_entry(2, (uint32_t)igate2_nmi_interrupt);
@@ -63,6 +67,10 @@ void setup_idt (void)
     setup_idt_gate_entry(18, (uint32_t)igate18_machine_check_abort);
     setup_idt_gate_entry(19, (uint32_t)igate19_simd_fp_fault);
     setup_idt_gate_entry(20, (uint32_t)igate20_virtualization_exception_fault);
+
+
+    /* setup interrupts also */
+    setup_idt_gate_entry(32, (uint32_t)igate32_timer_interrupt);
 
     __asm__ __volatile__ ("lidtl (%0)" : : "r" (&idtr_reg));
     return;

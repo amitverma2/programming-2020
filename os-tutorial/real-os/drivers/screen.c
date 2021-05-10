@@ -158,3 +158,9 @@ void kprint (char* str)
     kprint_at(str, -1, -1);
 }
 
+void kprint_dec (int val)
+{
+    char str[80] = "";
+    int_to_str(val, str);
+    kprint(str);
+}

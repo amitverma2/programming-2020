@@ -23,6 +23,7 @@
 [global igate18_machine_check_abort]
 [global igate19_simd_fp_fault]
 [global igate20_virtualization_exception_fault]
+[global igate32_timer_interrupt]
 
 igate_common_handler:
     ; the CPU pushed (optional SS and ESP), EFLAGS, CS, EIP (& optional Error code)
@@ -184,4 +185,10 @@ igate20_virtualization_exception_fault:
     push 0          ; error code
     push 20         ; vector number
     jmp igate_common_handler
+
+igate32_timer_interrupt:
+    cli
+    push 0
+    push 32
+    jmp igate_common_handler 
 

@@ -29,4 +29,5 @@ typedef enum {
 void clear_screen (void);
 void kprint_at (char* message, int row, int col);
 void kprint (char* message);
+void kprint_dec (int val);
 #endif // __SCREEN_H__
