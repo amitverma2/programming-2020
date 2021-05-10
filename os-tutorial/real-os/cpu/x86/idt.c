@@ -28,10 +28,13 @@ extern void igate20_virtualization_exception_fault (void);
 extern void igate32_timer_interrupt (void);
 
 idt_gate_descriptor_t idt_table[IDT_TABLE_SIZE];
+/* this doesn't work !!!! 
 idtr_reg_t idtr_reg = {
     sizeof(idt_table) - 1,
     (uint32_t)&idt_table
 };
+*/
+idtr_reg_t idtr_reg;
 
 static void setup_idt_gate_entry (int idx,
                                   uint32_t proc_address)
@@ -71,6 +74,9 @@ void setup_idt (void)
 
     /* setup interrupts also */
     setup_idt_gate_entry(32, (uint32_t)igate32_timer_interrupt);
+
+    idtr_reg.idt_limit = sizeof(idt_table) - 1;
+    idtr_reg.idt_base = (uint32_t)&idt_table;
 
     __asm__ __volatile__ ("lidtl (%0)" : : "r" (&idtr_reg));
     return;

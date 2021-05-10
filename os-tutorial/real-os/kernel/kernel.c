@@ -51,11 +51,14 @@ void my_kernel_entry (void)
     /* setup 8259A PIC */
     pic8259a_init();
 
+    /* now PIC is setup enable interrupts */
+    __asm__ volatile("sti");
+
     /* setup PIT programmable timer */
     timer_init();
 
     /* start the timer */
-    timer_start(50);
+    timer_start(20);
 
     int intro = 0;
 
@@ -65,12 +68,6 @@ void my_kernel_entry (void)
     }
 
     clear_screen();
-
-    /* raise some interrupts */
-    __asm__ __volatile__ ("int $0");
-    __asm__ __volatile__ ("int $3");
-    __asm__ __volatile__ ("int $5");
-    __asm__ __volatile__ ("int $20");
 
     return;
 }
