@@ -3,6 +3,7 @@
 #include "../../drivers/screen.h"
 #include "../../common/include/utils.h"
 #include "../../drivers/timer.h"
+#include "../../drivers/ports.h"
 
 char *exception_messages[] = {
     "Division By Zero",
@@ -59,6 +60,12 @@ igate_irq_handler (igate_registers_t regs) {
     switch(regs.vector_num) {
         case IRQ0_IGATE32_TIMER: timer_interrupt_handler(); break;
     }
+    if (regs.vector_num >= IRQ_START_SLAVE_PIC) {
+        /* EOI on slave PIC */
+        port_byte_out(0xA0, 0x20);
+    }
+    /* EOI on primary PIC */
+    port_byte_out(0x20, 0x20);
     return;
 }
 
