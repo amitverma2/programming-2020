@@ -24,6 +24,7 @@
 [global igate19_simd_fp_fault]
 [global igate20_virtualization_exception_fault]
 [global igate32_timer_interrupt]
+[global igate33_keyboard_interrupt]
 
 igate_common_handler:
     ; the CPU pushed (optional SS and ESP), EFLAGS, CS, EIP (& optional Error code)
@@ -190,5 +191,11 @@ igate32_timer_interrupt:
     cli
     push 0
     push 32
+    jmp igate_common_handler 
+
+igate33_keyboard_interrupt:
+    cli
+    push 0
+    push 33
     jmp igate_common_handler 
 

@@ -4,6 +4,7 @@
 #include "../cpu/x86/idt.h"
 #include "timer.h"
 #include "pic8259a.h"
+#include "keyboard.h"
 
 static void my_kernel_intro1 (void)
 {
@@ -68,6 +69,8 @@ void my_kernel_entry (void)
     }
 
     clear_screen();
+
+    init_keyboard();
 
     return;
 }

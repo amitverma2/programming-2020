@@ -26,6 +26,7 @@ extern void igate20_virtualization_exception_fault (void);
 
 /* interrupt vector */
 extern void igate32_timer_interrupt (void);
+extern void igate33_keyboard_interrupt (void);
 
 idt_gate_descriptor_t idt_table[IDT_TABLE_SIZE];
 /* this doesn't work !!!! 
@@ -74,6 +75,7 @@ void setup_idt (void)
 
     /* setup interrupts also */
     setup_idt_gate_entry(32, (uint32_t)igate32_timer_interrupt);
+    setup_idt_gate_entry(33, (uint32_t)igate33_keyboard_interrupt);
 
     idtr_reg.idt_limit = sizeof(idt_table) - 1;
     idtr_reg.idt_base = (uint32_t)&idt_table;

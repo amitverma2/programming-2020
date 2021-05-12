@@ -13,6 +13,7 @@ typedef struct {
 
 #define IRQ_START (32)
 #define IRQ0_IGATE32_TIMER (32)
+#define IRQ1_IGATE33_KEYBOARD (33)
 #define IRQ_START_SLAVE_PIC (40)
 
 void igate_c_handler (igate_registers_t regs);
