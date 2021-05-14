@@ -182,7 +182,7 @@ static void print_letter(uint8_t scancode) {
             kprint("LAlt");
             break;
         case 0x39:
-            kprint("Spc");
+            kprint(" "); // kprint("Spc");
             break;
         default:
             /* 'keuyp' event corresponds to the 'keydown' + 0x80 
@@ -191,8 +191,10 @@ static void print_letter(uint8_t scancode) {
             if (scancode <= 0x7f) {
                 kprint("Unknown key down");
             } else if (scancode <= 0x39 + 0x80) {
+                /*
                 kprint("key up ");
                 print_letter(scancode - 0x80);
+                */
             } else kprint("Unknown key up");
             break;
     }
@@ -202,10 +204,6 @@ void keyboard_interrupt_handler (void)
 {
     uint8_t keycode = port_byte_in(KEYBOARD_ENCODER_READ_PORT);
 
-    kprint("Received Keycode: ");
-    kprint_dec(keycode);
-    kprint(", ");
     print_letter(keycode);
-    kprint("\n");
 }
 
