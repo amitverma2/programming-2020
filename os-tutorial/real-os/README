@@ -1,0 +1,15 @@
+This concludes the real-os project.
+
+Learned
+
+1. Real mode bootup
+2. How to move to protected 32 bit mode
+3. GDT
+4. IDT
+5. A bit of cross compilation tooling
+6. Practical use of objdump/nasm/ld/gcc in a freestanding environment
+7. 8259A PIC basics
+8. Timer PIT
+9. Keyboard interrupt (basics)
+
+Now onto the next one...
