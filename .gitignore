@@ -5,3 +5,4 @@ settings.json
 tasks.json
 launch.json
 a.out
+*.swp
